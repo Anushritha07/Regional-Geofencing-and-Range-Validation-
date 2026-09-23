@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Geofence — Map Visualization</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .map-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .map-legend {
+    display: flex;
+    gap: 14px;
+    font-size: 10px;
+    color: var(--text-mid);
+    padding-top: 2px;
+  }
+  .map-legend span { display: flex; align-items: center; gap: 4px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot-blue { background: #2563c9; }
+  .dot-red { background: #d1451f; }
+
+  .map-canvas {
+    height: 360px;
+    position: relative;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, #eef0f2 28px),
+      repeating-linear-gradient(90deg, transparent, transparent 27px, #eef0f2 28px);
+  }
+  .geo-shape {
+    position: absolute;
+    top: 48%;
+    left: 42%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%) rotate(15deg);
+    border: 1.5px dashed #b9c2cc;
+  }
+  .geo-label {
+    position: absolute;
+    top: 52%;
+    left: 42%;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #b9c2cc;
+  }
+  .pin {
+    position: absolute;
+    font-size: 9px;
+    font-weight: 700;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 7px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .pin-target { top: 34%; left: 33%; }
+  .pin-launch { top: 58%; left: 46%; }
+
+  .map-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .layer-toggle {
+    display: flex;
+    gap: 4px;
+  }
+  .layer-toggle button {
+    font-size: 10px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--text-mid);
+  }
+  .layer-toggle button.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+  .zoom-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .zoom-controls button {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-mid);
+  }
+</style>
+</head>
+<body>
+
+  <header class="top-header">
+    <div>
+      <div class="brand-name">INDIA GEOFENCE</div>
+      <div class="brand-sub">Range &amp; Geofence Validation System</div>
+    </div>
+    <div class="system-status"><span class="status-dot"></span>SYSTEM READY</div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="nav-label">NAVIGATION</div>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="map-visualization.html" class="active">Geo Analysis</a>
+        <a href="system-database.html">Database</a>
+        <a href="audit-log.html">Audit Log</a>
+        <a href="#">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">MAP VISUALIZATION</div>
+      <div class="page-subtitle">Geographic Boundary Monitor</div>
+
+      <div class="panel map-panel">
+        <div class="panel-header">
+          <div>
+            <h2>GEOSPATIAL RANGE MONITOR</h2>
+            <div class="panel-sub">India Strategic Geofence Boundary Outline</div>
+          </div>
+          <div class="map-legend">
+            <span><span class="dot dot-blue"></span>Launch (Origin)</span>
+            <span><span class="dot dot-red"></span>Target (Dest)</span>
+          </div>
+        </div>
+
+        <div class="map-canvas">
+          <div class="geo-shape"></div>
+          <div class="geo-label">INDIA GEOFENCE</div>
+          <div class="pin pin-target">Target Point</div>
+          <div class="pin pin-launch">Launch Point</div>
+        </div>
+
+        <div class="map-toolbar">
+          <div class="layer-toggle">
+            <button class="active">Map</button>
+            <button>Satellite</button>
+          </div>
+          <div class="zoom-controls">
+            <button>+</button>
+            <button>–</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="system-bar">
+    <div>
+      <div class="brand-name">INDIA GEOFENCE</div>
+      <div class="brand-sub">Range &amp; Geofence Validation System</div>
+    </div>
+    <div class="system-status"><span class="status-dot"></span>SYSTEM READY</div>
+  </footer>
+
+</body>
+</html>

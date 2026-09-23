@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Geofence — System Database</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .db-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 10px;
+    max-width: 260px;
+    color: var(--text-light);
+    font-size: 11px;
+  }
+  .search-box input {
+    border: none;
+    outline: none;
+    font-size: 11px;
+    margin-left: 6px;
+    flex: 1;
+  }
+  .filter-select {
+    font-size: 11px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: #fff;
+    color: var(--text-mid);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead th {
+    text-align: left;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text-light);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 12px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dark);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  .view-link {
+    color: var(--orange);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 11px;
+  }
+  .view-link:hover { text-decoration: underline; }
+
+  /* System details modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 29, 35, 0.55);
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    width: 340px;
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    padding: 20px 22px 22px;
+  }
+  .modal h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .modal-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .modal-row:last-of-type { border-bottom: none; }
+  .modal-row .modal-label { color: var(--text-mid); }
+  .modal-row .modal-value { font-weight: 600; color: var(--text-dark); }
+  .modal-row .modal-value.status-active { color: var(--green); font-weight: 700; }
+  .modal .btn-primary {
+    width: 100%;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+  <header class="top-header">
+    <div>
+      <div class="brand-name">INDIA GEOFENCE</div>
+      <div class="brand-sub">Range &amp; Geofence Validation System</div>
+    </div>
+    <div class="system-status"><span class="status-dot"></span>SYSTEM READY</div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="nav-label">NAVIGATION</div>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="map-visualization.html">Geo Analysis</a>
+        <a href="system-database.html" class="active">Database</a>
+        <a href="audit-log.html">Audit Log</a>
+        <a href="#">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">SYSTEM DATABASE</div>
+      <div class="page-subtitle">List of registered range components and boundary parameters</div>
+
+      <div class="panel">
+        <div class="db-toolbar">
+          <div class="search-box">
+            🔍<input type="text" placeholder="Search systems...">
+          </div>
+          <select class="filter-select">
+            <option>Filter Status</option>
+          </select>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>SYSTEM ID</th>
+              <th>SYSTEM NAME</th>
+              <th>CATEGORY</th>
+              <th>RANGE CLASS</th>
+              <th>STATUS</th>
+              <th>LAST UPDATED</th>
+              <th>DETAILS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GF-001</td>
+              <td>Agni-V</td>
+              <td>Ballistic</td>
+              <td>Long Range</td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td>2024-01-15</td>
+              <td><a href="#" class="view-link" onclick="openModal(event)">View</a></td>
+            </tr>
+            <tr>
+              <td>GF-002</td>
+              <td>BrahMos</td>
+              <td>Cruise</td>
+              <td>Medium Range</td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td>2024-02-20</td>
+              <td><a href="#" class="view-link">View</a></td>
+            </tr>
+            <tr>
+              <td>GF-003</td>
+              <td>Prithvi-II</td>
+              <td>Ballistic</td>
+              <td>Short Range</td>
+              <td><span class="pill pill-maintenance">Maintenance</span></td>
+              <td>2024-03-10</td>
+              <td><a href="#" class="view-link">View</a></td>
+            </tr>
+            <tr>
+              <td>GF-004</td>
+              <td>Nirbhay</td>
+              <td>Cruise</td>
+              <td>Long Range</td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td>2024-01-28</td>
+              <td><a href="#" class="view-link">View</a></td>
+            </tr>
+            <tr>
+              <td>GF-005</td>
+              <td>Akash</td>
+              <td>Surface-Air</td>
+              <td>Medium Range</td>
+              <td><span class="pill pill-testing">Testing</span></td>
+              <td>2024-04-05</td>
+              <td><a href="#" class="view-link">View</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- System Details modal -->
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal">
+      <h3>System Details</h3>
+      <div class="modal-row">
+        <span class="modal-label">System ID</span>
+        <span class="modal-value">GF-001</span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">System Name</span>
+        <span class="modal-value">Agni-V</span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Category</span>
+        <span class="modal-value">Ballistic</span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Classification</span>
+        <span class="modal-value">Strategic</span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Status</span>
+        <span class="modal-value status-active">ACTIVE</span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Last Updated</span>
+        <span class="modal-value">2024-01-15</span>
+      </div>
+      <button class="btn-primary" onclick="closeModal()">CLOSE</button>
+    </div>
+  </div>
+
+  <script>
+    function openModal(e) {
+      e.preventDefault();
+      document.getElementById('detailsModal').classList.add('open');
+    }
+    function closeModal() {
+      document.getElementById('detailsModal').classList.remove('open');
+    }
+  </script>
+
+  <footer class="system-bar">
+    <div>
+      <div class="brand-name">INDIA GEOFENCE</div>
+      <div class="brand-sub">Range &amp; Geofence Validation System</div>
+    </div>
+    <div class="system-status"><span class="status-dot"></span>SYSTEM READY</div>
+  </footer>
+
+</body>
+</html>

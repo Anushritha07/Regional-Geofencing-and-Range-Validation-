@@ -1,0 +1,260 @@
+/* India Geofence — Dashboard base styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --navy: #1a1d23;
+  --navy-light: #23272f;
+  --orange: #e5622b;
+  --bg: #f3f4f6;
+  --panel-bg: #ffffff;
+  --border: #e2e5e9;
+  --text-dark: #1a1d23;
+  --text-mid: #5c6470;
+  --text-light: #9aa0a8;
+  --green: #1a9c5a;
+  --green-bg: #e5f6ec;
+  --amber: #b8860b;
+  --amber-bg: #fbf3d9;
+  --blue: #2563c9;
+  --blue-bg: #e8f0fd;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+  font-size: 13px;
+}
+
+
+.top-header {
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-header .brand-name {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+.top-header .brand-sub {
+  font-size: 10px;
+  color: #9aa0a8;
+  margin-top: 2px;
+}
+
+.top-header .system-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #d7dbe0;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3ecf6a;
+  display: inline-block;
+}
+
+/* App shell: sidebar + main */
+
+.app-shell {
+  display: flex;
+  min-height: calc(100vh - 42px);
+}
+
+.sidebar {
+  width: 160px;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  flex-shrink: 0;
+}
+
+.sidebar .nav-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-light);
+  margin-bottom: 10px;
+  padding: 0 8px;
+}
+
+.sidebar nav a {
+  display: block;
+  text-decoration: none;
+  font-size: 12px;
+  color: var(--text-mid);
+  padding: 8px 10px;
+  border-radius: 3px;
+  margin-bottom: 2px;
+}
+
+.sidebar nav a:hover {
+  background: #f3f4f6;
+}
+
+.sidebar nav a.active {
+  background: #fdeee7;
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.main {
+  flex: 1;
+  padding: 20px 24px;
+  min-width: 0;
+}
+
+.page-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.page-subtitle {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+  margin-bottom: 16px;
+}
+
+/* Panel */
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header h2 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.panel-header .panel-sub {
+  font-size: 10px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* Bottom system bar */
+
+.system-bar {
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.system-bar .brand-name {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.system-bar .brand-sub {
+  font-size: 10px;
+  color: #9aa0a8;
+  margin-top: 2px;
+}
+
+.system-bar .system-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #d7dbe0;
+}
+
+/* Status pills */
+
+.pill {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.pill-active { background: var(--green-bg); color: var(--green); }
+.pill-maintenance { background: var(--amber-bg); color: var(--amber); }
+.pill-testing { background: var(--blue-bg); color: var(--blue); }
+.pill-neutral { background: #eef0f2; color: var(--text-mid); }
+
+/* Buttons */
+
+.btn-primary {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #d1541f;
+}
+
+/* Form fields (dashboard) */
+
+.field {
+  margin-bottom: 12px;
+}
+
+.field label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-mid);
+  margin-bottom: 5px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text-dark);
+  background: #fff;
+}
+
+.field input::placeholder {
+  color: #b7bcc3;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--orange);
+}
