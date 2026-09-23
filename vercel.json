@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/auth-step-1.html"
+    }
+  ]
+}
