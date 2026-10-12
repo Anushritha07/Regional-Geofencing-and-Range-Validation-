@@ -118,6 +118,7 @@ function checkCorridorPath(lat1, lon1, lat2, lon2, bufferKm, numSamples) {
   let minDistanceKm = Infinity;
   let allInside = true;
   let allOutside = true;
+  const insideFlags = [];
 
   for (let i = 0; i <= numSamples; i++) {
     const t = i / numSamples;
@@ -125,6 +126,7 @@ function checkCorridorPath(lat1, lon1, lat2, lon2, bufferKm, numSamples) {
     const lon = lon1 + (lon2 - lon1) * t;
 
     const inside = checkPoint(lat, lon);
+    insideFlags.push(inside);
     if (inside) allOutside = false;
     if (!inside) allInside = false;
 
@@ -148,20 +150,69 @@ function checkCorridorPath(lat1, lon1, lat2, lon2, bufferKm, numSamples) {
     status = "safe";
   }
 
-  return { status: status, minDistanceKm: minDistanceKm, pathType: pathType };
+  // Count how many times the path goes from inside India to outside
+  // and back (used to detect a path that leaves and re-enters India).
+  let exits = 0;
+  let entries = 0;
+  for (let i = 1; i < insideFlags.length; i++) {
+    if (insideFlags[i - 1] && !insideFlags[i]) exits++;
+    if (!insideFlags[i - 1] && insideFlags[i]) entries++;
+  }
+
+  return {
+    status: status,
+    minDistanceKm: minDistanceKm,
+    pathType: pathType,
+    insideFlags: insideFlags,
+    exits: exits,
+    entries: entries,
+  };
 }
 
-// LAUNCH AUTHORIZATION
-// Rule: blocked if the target point is inside India (regardless of launch
-// point), or if distance exceeds the missile's configured range.
-function checkLaunchAuthorization(targetInside, distanceKm, rangeKm) {
-  if (targetInside) {
-    return { authorized: false, reason: "Target point is inside India — launch blocked." };
-  }
-  if (distanceKm > rangeKm) {
-    return { authorized: false, reason: "Distance exceeds missile's configured range — launch blocked." };
-  }
-  return { authorized: true, reason: "Target is outside India and within range — launch authorized." };
+// THE 5 GEOFENCE CONDITIONS
+// Every launch/target pair falls into exactly one of these. Flip `allowed`
+// to change what the system permits — nothing else needs to change.
+const GEOFENCE_CONDITIONS = [
+  { id: 1, label: "Launch INSIDE India, Target INSIDE India",  allowed: false,
+    reason: "Target is inside India." },
+  { id: 2, label: "Launch INSIDE India, Target OUTSIDE India", allowed: true,
+    reason: "Launch is inside India and target is outside India." },
+  { id: 3, label: "Launch OUTSIDE India, Target INSIDE India", allowed: false,
+    reason: "Launch is outside India and target is inside India." },
+  { id: 4, label: "Launch OUTSIDE India, Target OUTSIDE India", allowed: false,
+    reason: "Launch point is not inside India." },
+  { id: 5, label: "Launch INSIDE, Target OUTSIDE, path re-enters India", allowed: false,
+    reason: "Flight path leaves India and re-enters it." },
+];
+
+// Picks which of the 5 conditions applies.
+function classifyGeofenceCondition(launchInside, targetInside, pathEntries) {
+  let id;
+  if (launchInside && targetInside) id = 1;
+  else if (launchInside && !targetInside) id = pathEntries > 0 ? 5 : 2;
+  else if (!launchInside && targetInside) id = 3;
+  else id = 4;
+  return GEOFENCE_CONDITIONS[id - 1];
+}
+
+// LAUNCH AUTHORIZATION — BOTH gates must pass:
+//   Gate 1: the geofence condition (one of the 5) must be an allowed one
+//   Gate 2: the distance must be within the missile's configured range
+function checkLaunchAuthorization(condition, distanceKm, rangeKm) {
+  const geofenceOk = condition.allowed;
+  const rangeOk = distanceKm <= rangeKm;
+  const reasons = [];
+  if (!geofenceOk) reasons.push(condition.reason);
+  if (!rangeOk) reasons.push("Distance (" + distanceKm.toFixed(1) + " km) is more than the missile range (" + rangeKm + " km).");
+
+  return {
+    authorized: geofenceOk && rangeOk,
+    geofenceOk: geofenceOk,
+    rangeOk: rangeOk,
+    reason: geofenceOk && rangeOk
+      ? "Launch is inside India, target is outside India, and the distance is within the missile range."
+      : reasons.join(" "),
+  };
 }
 
 // GEO UTILITIES for building a real corridor polygon

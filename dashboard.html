@@ -3,571 +3,345 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation</title>
-
+<title>Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation — Dashboard</title>
 <link rel="stylesheet" href="base.css">
-
 <style>
-.content-row-label{
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:.4px;
-  color:var(--text-light);
-  padding:14px 24px 0;
-}
+  .content-row-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text-light);
+    padding: 14px 24px 0;
+  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+    padding: 12px 24px 24px;
+  }
+  .panel-body { padding: 16px; }
+  fieldset { border: none; margin-bottom: 16px; }
+  .fieldset-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text-mid);
+    margin-bottom: 8px;
+  }
+  .map-canvas {
+    height: clamp(480px, 70vh, 800px);
+    position: relative;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 21px, #eef0f2 22px),
+      repeating-linear-gradient(90deg, transparent, transparent 21px, #eef0f2 22px);
+    border-bottom: 1px solid var(--border);
+  }
+  .map-legend {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--text-mid);
+    z-index: 5;
+    background: rgba(255,255,255,0.85);
+    padding: 4px 8px;
+    border-radius: 3px;
+  }
+  .map-legend span { display: flex; align-items: center; gap: 4px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot-blue { background: #2563c9; }
+  .dot-red { background: #d1451f; }
+  .geo-shape {
+    position: absolute;
+    top: 50%;
+    left: 42%;
+    width: 130px;
+    height: 130px;
+    transform: translate(-50%, -50%) rotate(20deg);
+    border: 1.5px dashed #b9c2cc;
+  }
+  .geo-label {
+    position: absolute;
+    top: 55%;
+    left: 42%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #b9c2cc;
+  }
+  .map-footer {
+    padding: 8px 16px;
+    font-size: 9px;
+    color: var(--text-light);
+    display: flex;
+    justify-content: space-between;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--border);
+  }
+  .stat {
+    padding: 12px 14px;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat .stat-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+  .stat .stat-value { font-size: 12px; font-weight: 600; }
+  .banner {
+    margin: 14px 16px 16px;
+    background: #fdf3d4;
+    border: 1px solid #f0dd9c;
+    border-radius: 3px;
+    padding: 10px 12px;
+  }
+  .banner .banner-title {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #9c7a12;
+    margin-bottom: 3px;
+  }
+  .banner .banner-text { font-size: 11px; color: #6b5a1f; }
+  .analyze-btn { width: 100%; }
+  .dashboard-grid { align-items: stretch; }
 
-.dashboard-grid{
-  display:grid;
-  grid-template-columns:300px 1fr;
-  gap:16px;
-  padding:12px 24px 24px;
-}
+  /* Info bar above the map: shows the launch & target points entered */
+  .map-info-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-cell {
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .info-cell + .info-cell { border-left: 1px solid var(--border); }
+  .info-cell .info-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.4px;
+    color: var(--text-light); display: flex; align-items: center; gap: 6px;
+  }
+  .info-cell .info-coords { font-size: 14px; font-weight: 700; }
+  .info-cell .info-coords.empty { color: var(--text-light); font-weight: 500; }
 
-.panel-body{
-  padding:16px;
-}
+  /* 5 conditions checklist */
+  .section-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.4px;
+    color: var(--text-mid); padding: 14px 16px 6px;
+    border-top: 1px solid var(--border);
+  }
+  .cond-list { padding: 0 16px 10px; display: grid; gap: 4px; }
+  .cond-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; padding: 6px 8px; border-radius: 3px;
+    background: #f7f8f9; color: var(--text-mid);
+    border: 1px solid transparent;
+  }
+  .cond-row .cond-num {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    background: #e2e5e9; color: var(--text-mid);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .cond-row .cond-flag { margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; }
+  .cond-row.match-ok  { background: var(--green-bg); border-color: #bfe6cf; color: var(--green); font-weight: 600; }
+  .cond-row.match-ok .cond-num { background: var(--green); color: #fff; }
+  .cond-row.match-bad { background: #fdeceb; border-color: #f3c4bf; color: #b3321f; font-weight: 600; }
+  .cond-row.match-bad .cond-num { background: #b3321f; color: #fff; }
 
-.fieldset-label{
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:.4px;
-  color:var(--text-mid);
-  margin-bottom:8px;
-}
+  /* Two launch gates */
+  .gate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 14px; }
+  .gate { border: 1px solid var(--border); border-radius: 3px; padding: 8px 10px; }
+  .gate .gate-label { font-size: 8px; font-weight: 700; letter-spacing: 0.4px; color: var(--text-light); margin-bottom: 4px; }
 
-.map-canvas{
-  height:260px;
-  position:relative;
-  border-bottom:1px solid var(--border);
-}
+  /* Safety coordinates table */
+  .coord-wrap { padding: 0 16px 16px; overflow-x: auto; }
+  table.coord-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .coord-table th {
+    text-align: left; font-size: 8px; letter-spacing: 0.4px; color: var(--text-light);
+    padding: 6px 8px; border-bottom: 1px solid var(--border);
+  }
+  .coord-table td { padding: 6px 8px; border-bottom: 1px solid #f0f1f3; font-variant-numeric: tabular-nums; }
+  .coord-table td.cname { font-weight: 600; }
+  .coord-table .empty-row td { color: var(--text-light); text-align: center; padding: 14px; }
+  .info-cell .info-name { font-size: 15px; font-weight: 700; line-height: 1.25; }
+  .info-cell .info-name.empty { color: var(--text-light); font-weight: 500; }
+  .info-cell .info-coords { font-size: 11px !important; font-weight: 500 !important; color: var(--text-mid); }
+  .info-cell .pill { font-size: 10px; padding: 3px 9px; }
+  .banner.banner-ok  { background: var(--green-bg); border-color: #bfe6cf; }
+  .banner.banner-ok  .banner-title { color: var(--green); }
+  .banner.banner-ok  .banner-text  { color: #176b40; }
+  .banner.banner-bad { background: #fdeceb; border-color: #f3c4bf; }
+  .banner.banner-bad .banner-title { color: #b3321f; }
+  .banner.banner-bad .banner-text  { color: #7d2417; }
+  .banner .banner-title { font-size: 14px; }
+  .copy-btn {
+    margin: 0 16px 14px; background: #fff; border: 1px solid var(--border);
+    border-radius: 3px; font-size: 10px; font-weight: 700; padding: 6px 10px; cursor: pointer;
+    color: var(--text-mid);
+  }
+  .copy-btn:hover { border-color: var(--orange); color: var(--orange); }
 
-.map-legend{
-  position:absolute;
-  top:10px;
-  right:12px;
-  display:flex;
-  gap:12px;
-  font-size:10px;
-  color:var(--text-mid);
-  z-index:5;
-  background:rgba(255,255,255,.9);
-  padding:4px 8px;
-  border-radius:3px;
-}
-
-.map-legend span{
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-
-.dot{
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  display:inline-block;
-}
-
-.dot-blue{
-  background:#2563c9;
-}
-
-.dot-red{
-  background:#d1451f;
-}
-
-.map-footer{
-  padding:8px 16px;
-  font-size:9px;
-  color:var(--text-light);
-  display:flex;
-  justify-content:space-between;
-}
-
-.stat-row{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  border-top:1px solid var(--border);
-}
-
-.stat{
-  padding:12px 14px;
-  border-right:1px solid var(--border);
-  min-height:62px;
-}
-
-.stat:last-child{
-  border-right:none;
-}
-
-.stat-label{
-  font-size:8px;
-  font-weight:700;
-  letter-spacing:.4px;
-  color:var(--text-light);
-  margin-bottom:5px;
-}
-
-.stat-value{
-  font-size:12px;
-  font-weight:600;
-}
-
-.range-ok{
-  color:#1a9c5a;
-}
-
-.range-fail{
-  color:#d1451f;
-}
-
-.banner{
-  margin:14px 16px 16px;
-  background:#fdf3d4;
-  border:1px solid #f0dd9c;
-  border-radius:3px;
-  padding:10px 12px;
-}
-
-.banner-title{
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:.4px;
-  color:#9c7a12;
-  margin-bottom:3px;
-}
-
-.banner-text{
-  font-size:11px;
-  color:#6b5a1f;
-}
-
-.analyze-btn{
-  width:100%;
-}
+  /* ---- Fit everything in one window (desktop) ---- */
+  @media (min-width: 900px) {
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .dashboard-grid { flex: 1; min-height: 0; padding: 12px 24px; }
+    .dashboard-grid > .panel { min-height: 0; display: flex; flex-direction: column; }
+    .dashboard-grid > .panel:first-child { overflow-y: auto; }   /* left form scrolls only if the screen is very short */
+    .map-canvas { flex: 1; height: auto !important; min-height: 220px; }
+    .map-info-bar, .map-footer, .stat-row, .banner, .panel-header { flex-shrink: 0; }
+    .banner { margin: 10px 16px 12px; }
+    .stat { padding: 8px 14px; }
+    .top-header { padding: 8px 20px; }
+    .system-bar { padding: 8px 24px; }
+  }
 </style>
 </head>
-
 <body>
 
-<header class="top-header">
+  <header class="top-header">
+    <div>
+      <div class="brand-name">Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation</div>
+    </div>
+    <div class="system-status"><span class="status-dot"></span>SYSTEM READY</div>
+  </header>
 
-<div>
-  <div class="brand-name">
-    REGIONAL GEOFENCING
+  <div class="dashboard-grid">
+
+    <!-- Mission Parameters panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>MISSION PARAMETERS</h2>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <label>SELECT MISSILE</label>
+          <select id="missileSelect">
+            <option value="">Select missile</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>CONFIGURED RANGE</label>
+          <input type="text" id="configuredRange" placeholder="— km" readonly>
+        </div>
+
+        <div class="fieldset-label">LAUNCH POINT (ORIGIN)</div>
+        <div class="field">
+          <label>Latitude</label>
+          <input type="number" step="any" id="launchLat" placeholder="Enter latitude">
+        </div>
+        <div class="field">
+          <label>Longitude</label>
+          <input type="number" step="any" id="launchLon" placeholder="Enter longitude">
+        </div>
+        <div class="field">
+          <label>Altitude (m)</label>
+          <input type="number" step="any" id="launchAlt" placeholder="Enter altitude">
+        </div>
+
+        <div class="fieldset-label">TARGET POINT (DESTINATION)</div>
+        <div class="field">
+          <label>Latitude</label>
+          <input type="number" step="any" id="targetLat" placeholder="Enter latitude">
+        </div>
+        <div class="field">
+          <label>Longitude</label>
+          <input type="number" step="any" id="targetLon" placeholder="Enter longitude">
+        </div>
+        <div class="field">
+          <label>Altitude (m)</label>
+          <input type="number" step="any" id="targetAlt" placeholder="Enter altitude">
+        </div>
+
+        <div class="fieldset-label">SAFETY CORRIDOR</div>
+        <div class="field">
+          <label>Corridor Width (km, each side)</label>
+          <input type="number" step="1" min="5" max="500" id="corridorWidth" value="100" placeholder="e.g. 100">
+        </div>
+
+        <button class="btn-primary analyze-btn" id="analyzeBtn">ANALYZE RANGE</button>
+      </div>
+    </div>
+
+    <!-- Map + stats panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>GEOSPATIAL RANGE MONITOR</h2>
+        <div class="panel-sub">India Strategic Geofence Boundary Outline</div>
+      </div>
+
+      <div class="map-info-bar">
+        <div class="info-cell">
+          <div class="info-title"><span class="dot dot-blue"></span>LAUNCH POINT <span class="pill pill-neutral" id="launchInfoStatus">—</span></div>
+          <div class="info-name empty" id="launchInfoName">Not entered</div>
+          <div class="info-coords" id="launchInfoCoords"></div>
+        </div>
+        <div class="info-cell">
+          <div class="info-title"><span class="dot dot-red"></span>TARGET POINT <span class="pill pill-neutral" id="targetInfoStatus">—</span></div>
+          <div class="info-name empty" id="targetInfoName">Not entered</div>
+          <div class="info-coords" id="targetInfoCoords"></div>
+        </div>
+      </div>
+
+      <div class="map-canvas">
+        <div class="map-legend">
+          <span><span class="dot dot-blue"></span>Launch (Origin)</span>
+          <span><span class="dot dot-red"></span>Target (Dest)</span>
+        </div>
+        <div id="map" style="width:100%; height:100%;"></div>
+      </div>
+      <div class="map-footer">
+        <span>GRID SCALE: LIVE MAP</span>
+        <span>COORDINATE SYSTEM: WGS-84</span>
+      </div>
+
+      <div class="stat-row" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat">
+          <div class="stat-label">MISSILE RANGE</div>
+          <div class="stat-value" id="configRangeStat">— km</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">DISTANCE (LAUNCH &rarr; TARGET)</div>
+          <div class="stat-value" id="calcDistance">— km</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">RANGE CHECK</div>
+          <span class="pill pill-neutral" id="rangeCheckStatus">NOT CHECKED</span>
+        </div>
+      </div>
+
+      <div class="banner" id="resultBanner">
+        <div class="banner-title">AWAITING INPUT</div>
+        <div class="banner-text">Enter the launch and target points, select a missile and click Analyze to see whether the missile can be launched.</div>
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="brand-sub">
-    Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation
-  </div>
-</div>
-
-<div class="system-status">
-  <span class="status-dot"></span>
-  SYSTEM READY
-</div>
-
-</header>
-
-
-<p class="content-row-label">
-COMPUTATIONAL GEOMETRY &amp; RANGE VALIDATION
-</p>
-
-
-<div class="dashboard-grid">
-
-
-<!-- LEFT SIDE -->
-
-<div class="panel">
-
-<div class="panel-header">
-<h2>MISSION PARAMETERS</h2>
-</div>
-
-<div class="panel-body">
-
-
-<div class="field">
-
-<label>SELECT MISSILE</label>
-
-<select id="missileSelect">
-
-<option value="">
-Select missile
-</option>
-
-</select>
-
-</div>
-
-
-<div class="field">
-
-<label>CONFIGURED RANGE</label>
-
-<input
-type="text"
-id="configuredRange"
-placeholder="— km"
-readonly
->
-
-</div>
-
-
-<div class="fieldset-label">
-LAUNCH POINT (ORIGIN)
-</div>
-
-
-<div class="field">
-
-<label>Latitude</label>
-
-<input
-type="number"
-step="any"
-id="launchLat"
-placeholder="Enter latitude"
->
-
-</div>
-
-
-<div class="field">
-
-<label>Longitude</label>
-
-<input
-type="number"
-step="any"
-id="launchLon"
-placeholder="Enter longitude"
->
-
-</div>
-
-
-<div class="field">
-
-<label>Altitude (m)</label>
-
-<input
-type="number"
-step="any"
-id="launchAlt"
-placeholder="Enter altitude"
->
-
-</div>
-
-
-<div class="fieldset-label">
-TARGET POINT (DESTINATION)
-</div>
-
-
-<div class="field">
-
-<label>Latitude</label>
-
-<input
-type="number"
-step="any"
-id="targetLat"
-placeholder="Enter latitude"
->
-
-</div>
-
-
-<div class="field">
-
-<label>Longitude</label>
-
-<input
-type="number"
-step="any"
-id="targetLon"
-placeholder="Enter longitude"
->
-
-</div>
-
-
-<div class="field">
-
-<label>Altitude (m)</label>
-
-<input
-type="number"
-step="any"
-id="targetAlt"
-placeholder="Enter altitude"
->
-
-</div>
-
-
-<div class="fieldset-label">
-SAFETY CORRIDOR
-</div>
-
-
-<div class="field">
-
-<label>
-Corridor Width (km, each side)
-</label>
-
-<input
-type="number"
-step="1"
-min="5"
-max="500"
-id="corridorWidth"
-value="100"
->
-
-</div>
-
-
-<button
-class="btn-primary analyze-btn"
-id="analyzeBtn"
->
-ANALYZE RANGE
-</button>
-
-
-</div>
-</div>
-
-
-<!-- RIGHT SIDE -->
-
-<div class="panel">
-
-<div class="panel-header">
-
-<h2>
-GEOSPATIAL RANGE MONITOR
-</h2>
-
-<div class="panel-sub">
-Regional Geofence Boundary and Range Validation
-</div>
-
-</div>
-
-
-<div class="map-canvas">
-
-<div class="map-legend">
-
-<span>
-<span class="dot dot-blue"></span>
-Launch Point
-</span>
-
-<span>
-<span class="dot dot-red"></span>
-Target Point
-</span>
-
-</div>
-
-
-<div
-id="map"
-style="width:100%;height:100%;"
-></div>
-
-</div>
-
-
-<div class="map-footer">
-
-<span>
-GRID SCALE: LIVE MAP
-</span>
-
-<span>
-COORDINATE SYSTEM: WGS-84
-</span>
-
-</div>
-
-
-<!-- ROW 1 -->
-
-<div class="stat-row">
-
-<div class="stat">
-
-<div class="stat-label">
-LAUNCH POINT
-</div>
-
-<div
-class="stat-value"
-id="launchPointStat"
->
-—
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-label">
-TARGET POINT
-</div>
-
-<div
-class="stat-value"
-id="targetPointStat"
->
-—
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-label">
-CALCULATED DISTANCE
-</div>
-
-<div
-class="stat-value"
-id="calcDistance"
->
-— km
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ROW 2 -->
-
-<div class="stat-row">
-
-<div class="stat">
-
-<div class="stat-label">
-CONFIGURED RANGE
-</div>
-
-<div
-class="stat-value"
-id="configRangeStat"
->
-— km
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-label">
-RANGE CHECK
-</div>
-
-<div
-class="stat-value"
-id="rangeCheckStatus"
->
-NOT CHECKED
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-label">
-RANGE VALIDATION
-</div>
-
-<div
-class="stat-value"
-id="rangeValidationStatus"
->
-NOT CHECKED
-</div>
-
-</div>
-
-</div>
-
-
-<div
-class="banner"
-id="resultBanner"
->
-
-<div class="banner-title">
-AWAITING INPUT
-</div>
-
-<div class="banner-text">
-Enter the required coordinates and select a range configuration to begin validation.
-</div>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<footer class="system-bar">
-
-<div>
-
-<div class="brand-name">
-REGIONAL GEOFENCING
-</div>
-
-<div class="brand-sub">
-Computational Geometry Framework
-</div>
-
-</div>
-
-
-<div class="system-status">
-
-<span class="status-dot"></span>
-SYSTEM READY
-
-</div>
-
-</footer>
-
-
-<script src="missiles-data.js"></script>
-<script src="geofence-logic.js"></script>
-<script src="app.js"></script>
-
-
-<script
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUK2xr-j2IJw-m5j7c7qQ-XqQ43cj9LqM&loading=async&callback=initMap"
-async
-defer>
-</script>
-
+  <footer class="system-bar">
+    <div>
+      <div class="brand-name">Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation</div>
+    </div>
+    <div class="system-status"><span class="status-dot"></span>SYSTEM READY</div>
+  </footer>
+
+  <script src="js/missiles-data.js"></script>
+  <script src="js/geofence-logic.js"></script>
+  <script src="js/app.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUK2xr-j2IJw-m5j7c7qQ-XqQ43cj9LqM&loading=async&callback=initMap" async defer></script>
 
 </body>
 </html>

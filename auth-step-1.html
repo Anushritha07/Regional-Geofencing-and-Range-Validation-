@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -9,69 +8,45 @@
 </head>
 <body>
 
-<div class="auth-card">
-  <p class="step-label">STEP 1 OF 2</p>
-  <h1>REGIONAL GEOFENCING</h1>
-  <p class="subtitle">Secure Access Portal</p>
+  <div class="auth-card">
+    <p class="step-label">STEP 1 OF 2</p>
+    <h1 style="font-size:14px; line-height:1.35;">Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation</h1>
+    <p class="subtitle">Secure Access Portal</p>
 
-  <form id="loginForm">
-    <div class="field">
-      <label for="user-id">USER ID</label>
-      <input type="text" id="user-id" placeholder="Enter User ID" required>
+    <form id="loginForm">
+      <div class="field">
+        <label for="user-id">USER ID</label>
+        <input type="text" id="user-id" placeholder="Enter User ID" required>
+      </div>
+
+      <div class="field">
+        <label for="password">PASSWORD</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn-primary">SIGN IN</button>
+    </form>
+  </div>
+
+  <div class="system-bar">
+    <div class="brand-block">
+      <div class="brand-name">Design and Development of a Computational Geometry Framework for Regional Geofencing and Range Validation</div>
     </div>
-
-<div class="field">
-  <label for="password">PASSWORD</label>
-  <input type="password" id="password" placeholder="Enter Password" required>
-</div>
-
-<button type="submit" class="btn-primary">SIGN IN</button>
-
-
-  </form>
-</div>
-
-<div class="system-bar">
-  <div class="brand-block">
-    <div class="brand-name">REGIONAL GEOFENCING</div>
-    <div class="brand-sub">Range &amp; Geofence Validation Framework</div>
+    <div class="system-status">
+      <span class="status-dot"></span>
+      SYSTEM READY
+    </div>
   </div>
 
-  <div class="system-status">
-    <span class="status-dot"></span>
-    SYSTEM READY
-  </div>
-</div>
-
-<script>
-const users = {
-  user1: "password1",
-  user2: "password2"
-};
-
-document.getElementById("loginForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  const userId = document.getElementById("user-id").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (users[userId] && users[userId] === password) {
-
-    sessionStorage.setItem("authenticatedUser", userId);
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    sessionStorage.setItem("otpCode", code);
-
-    alert("Your verification code is: " + code);
-
-    window.location.href = "auth-step-2.html";
-
-  } else {
-    alert("Invalid User ID or Password.");
-  }
-});
-</script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      sessionStorage.setItem('otpCode', code);
+      alert('Your verification code is: ' + code);
+      window.location.href = 'auth-step-2.html';
+    });
+  </script>
 
 </body>
 </html>
